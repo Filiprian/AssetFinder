@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import Coin from "./coin";
 
+interface SideBarProps {
+    handleClick: (id: string) => void
+}
 
-export default function SideBar() {
+
+export default function SideBar({handleClick}: SideBarProps) {
 
     const [coins, setCoins] = useState([])
 
@@ -34,14 +38,14 @@ export default function SideBar() {
 
 
     return (
-        <div>
-            <h2>Filtr</h2>
+        <div className="flex flex-col justify-left">
+            <h2 className="text-left text-2xl font-bold">Filters:</h2>
             {/*filtering settings*/}
-            <h2>Crypto:</h2>
+            <h2 className="text-left text-3xl font-bold">Results:</h2>
             {
                 coins 
                     ? coins
-                        .map(coin => <Coin data={coin}/>)
+                        .map(coin => <Coin data={coin} handleCoinSelect={handleClick}/>)
                     : <div className="text-2xl font-bold">Nothing found...</div>
             }
         </div>

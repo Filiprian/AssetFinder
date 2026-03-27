@@ -8,7 +8,8 @@ export default function Menu() {
 
 
     return (
-        <div className="flex gap-5">
+        <menu className="flex gap-5">
+            <h1 className="text-4xl font-bold">AssetFinder</h1>
             <div className="flex gap-2.5">
                 <label>Dark Mode</label>
                 <input type="checkbox" checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
@@ -20,6 +21,6 @@ export default function Menu() {
                     <option value="eur">EUR</option>
                 </select>
             </div>
-        </div>
+        </menu>
     );
 }
