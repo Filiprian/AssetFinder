@@ -9,6 +9,7 @@ interface SideBarProps {
 export default function SideBar({handleClick}: SideBarProps) {
 
     const [coins, setCoins] = useState([])
+    const [page, setPage] = useState(1)
 
     const apiKey = import.meta.env.VITE_API_KEY
     const options = {method: 'GET', headers: {'x-cg-demo-api-key': apiKey}};
@@ -16,8 +17,8 @@ export default function SideBar({handleClick}: SideBarProps) {
     const url = new URL('https://api.coingecko.com/api/v3/coins/markets');
         url.searchParams.append('vs_currency', 'usd');
         url.searchParams.append('order', 'market_cap_desc');
-        url.searchParams.append('per_page', "50");
-        url.searchParams.append('page', "1");
+        url.searchParams.append('per_page', "8");
+        url.searchParams.append('page', `${page}`);
         url.searchParams.append('sparkline', 'false');
 
     async function getCoins() {
@@ -32,9 +33,19 @@ export default function SideBar({handleClick}: SideBarProps) {
         }
     }
 
+    const previousPage = () => {
+        if (page != 1) {
+            setPage(prevPage => prevPage - 1);
+        }
+    }
+
+    const nextPage = () => {
+        setPage(prevPage => prevPage + 1);
+    }
+
     useEffect(() => {
         getCoins()
-    }, []);
+    }, [page]);
 
 
     return (
@@ -48,6 +59,15 @@ export default function SideBar({handleClick}: SideBarProps) {
                         .map(coin => <Coin data={coin} handleCoinSelect={handleClick}/>)
                     : <div className="text-2xl font-bold">Nothing found...</div>
             }
+            <div className="flex gap-3 justify-center items-center">
+                <button onClick={previousPage}>
+                    Prev
+                </button>
+                <p>{page}</p>
+                <button onClick={nextPage}>
+                    Next
+                </button>
+            </div>
         </div>
     )
 }
