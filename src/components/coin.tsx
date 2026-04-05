@@ -47,7 +47,7 @@ export default function Coin({data, handleCoinSelect}: CoinProps) {
     }
 
     return (
-        <div className="flex m-1 p-2.5 justify-left items-center border border-gray-500 rounded-2xl cursor-pointer w-50"
+        <div className="flex m-1 p-2.5 justify-left items-center border border-gray-500 rounded-2xl cursor-pointer w-55"
             onClick={handleClick}>
             <img className="w-8 h-8 mr-3" src={coin.image} alt={coin.id}/>
             <div className="flex justify-between items-center w-full">
