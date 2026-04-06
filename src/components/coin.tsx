@@ -5,9 +5,10 @@ import { fav_db } from "../db";
 interface CoinProps {
     data: any
     handleCoinSelect: (id: string) => void
+    refreshFavourites: () => void
 }
 
-export default function Coin({data, handleCoinSelect}: CoinProps) {
+export default function Coin({data, handleCoinSelect, refreshFavourites}: CoinProps) {
 
     const coin = data
     const handleClick = () => {
@@ -41,6 +42,7 @@ export default function Coin({data, handleCoinSelect}: CoinProps) {
                 })
                 setIsFavourite(true)
             }
+            refreshFavourites()
         } catch (error) {
             console.error("Failed to toggle favourite", error)
         }
