@@ -6,28 +6,15 @@ interface CoinProps {
     data: any
     handleCoinSelect: (id: string) => void
     refreshFavourites: () => void
+    isFavourite: boolean
 }
 
-export default function Coin({data, handleCoinSelect, refreshFavourites}: CoinProps) {
+export default function Coin({data, handleCoinSelect, refreshFavourites, isFavourite}: CoinProps) {
 
     const coin = data
     const handleClick = () => {
         handleCoinSelect(coin.id)
     }
-
-    const [isFavourite, setIsFavourite] = useState(false)
-
-    useEffect(() => {
-        const checkFavourtie = async () => {
-            try {
-                const existing = await fav_db.favourites.where("coinID").equals(coin.id).first()
-                setIsFavourite(!!existing)
-            } catch (error) {
-                console.error(`Error checking fav status ${error}`)
-            }
-        }
-        checkFavourtie()
-    }, [])
 
     const toggleFavourite = async (e: React.MouseEvent) => {
         e.stopPropagation() // Prevent parent div from firing onClick
@@ -35,12 +22,10 @@ export default function Coin({data, handleCoinSelect, refreshFavourites}: CoinPr
         try {
             if (isFavourite) {
                 await fav_db.favourites.where("coinID").equals(coin.id).delete()
-                setIsFavourite(false)
             } else {
                 await fav_db.favourites.add({
                     coinID: coin.id,
                 })
-                setIsFavourite(true)
             }
             refreshFavourites()
         } catch (error) {

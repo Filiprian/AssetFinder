@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import Coin from "./coin";
 import { getCryptoData } from "../cryptoCache";
 import { fav_db } from "../db";
@@ -11,29 +11,29 @@ interface SideBarProps {
 export default function SideBar({handleClick}: SideBarProps) {
 
     const [coins, setCoins] = useState([])
-    const [page, setPage] = useState(1)
     const [favourites, setFavourties] = useState([])
 
     const [pinFavourties, setPinFavourites] = useState(true)
     const [search, setSearch] = useState("")
-    const [sorting, setSorting] = useState("highest")
+    const [sorting, setSorting] = useState("highest_market_cap")
 
-    const COINS_PER_PAGE = 8
-    const totalPages = Math.ceil(coins.length/COINS_PER_PAGE)
+    const scrollRef = useRef<HTMLDivElement>(null)
+    const [showScrollTop, setShowScrollTop] = useState(false)
 
-    const previousPage = () => {
-        if (page != 1) {
-            setPage(prevPage => prevPage - 1);
-        } else {
-            setPage(totalPages)
+    // Show scroll to top button
+    const handleScroll = () => {
+        if (scrollRef.current) {
+            const isScrolled = scrollRef.current.scrollTop > 200
+            setShowScrollTop(isScrolled)
         }
     }
 
-    const nextPage = () => {
-        if (page != totalPages) {
-            setPage(prevPage => prevPage + 1);
-        } else {
-            setPage(1)
+    const scrollToTop = () => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            })
         }
     }
 
@@ -63,6 +63,7 @@ export default function SideBar({handleClick}: SideBarProps) {
     }, []);
 
     const filteredCoins = useMemo(() => {
+        loadFavourites()
         let result = [...coins]
 
         if (search.trim()) {
@@ -95,9 +96,7 @@ export default function SideBar({handleClick}: SideBarProps) {
         return result
     }, [coins, search, sorting, pinFavourties, favourites])
 
-    const startIndex = (page-1) * COINS_PER_PAGE
-    const endIndex = startIndex + COINS_PER_PAGE
-    const showCoins = filteredCoins.slice(startIndex, endIndex)
+    const showCoins = filteredCoins
 
     return (
         <div className="flex flex-col justify-left">
@@ -123,20 +122,20 @@ export default function SideBar({handleClick}: SideBarProps) {
                 </div>
             </form>
             <h2 className="text-left text-3xl font-bold">Results:</h2>
-            {
-                showCoins 
-                    ? showCoins
-                        .map(coin => <Coin data={coin} handleCoinSelect={handleClick} refreshFavourites={loadFavourites}/>)
-                    : <div className="text-2xl font-bold">Nothing found...</div>
-            }
-            <div className="flex gap-3 justify-center items-center">
-                <button onClick={previousPage}>
-                    Prev
-                </button>
-                <p>{page}</p>
-                <button onClick={nextPage}>
-                    Next
-                </button>
+            <div className="relative">
+                <div ref={scrollRef} onScroll={handleScroll} className="h-[60vh] overflow-y-auto pr-2 border-gray-300 outline-2 outline-gray-300 rounded-2xl">
+                    {
+                        showCoins 
+                            ? showCoins
+                                .map(coin => <Coin data={coin} handleCoinSelect={handleClick} refreshFavourites={loadFavourites} isFavourite={new Set(favourites.map(f => f.coinID)).has(coin.id)}/>)
+                            : <div className="text-2xl font-bold">Nothing found...</div>
+                    }
+                </div>
+                {
+                    showScrollTop && (
+                        <button onClick={scrollToTop} className="absolute bottom-1 left-22">↑</button>
+                    )
+                }
             </div>
         </div>
     )
