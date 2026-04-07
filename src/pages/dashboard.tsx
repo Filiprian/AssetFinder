@@ -39,7 +39,6 @@ export default function Dashboard() {
           if (data) {
             console.log("Data fetched", data)
               setCoinData(data)
-              console.log(data)
           }
       } catch {
           console.error("Couldnt fetch the data")

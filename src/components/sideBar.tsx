@@ -8,7 +8,6 @@ interface SideBarProps {
     handleClick: (id: string) => void
 }
 
-
 export default function SideBar({handleClick, currentCurrency}: SideBarProps) {
 
     const [coins, setCoins] = useState([])
@@ -19,15 +18,8 @@ export default function SideBar({handleClick, currentCurrency}: SideBarProps) {
     const [sorting, setSorting] = useState("highest_market_cap")
 
     const scrollRef = useRef<HTMLDivElement>(null)
-    const [showScrollTop, setShowScrollTop] = useState(false)
 
-    // Show scroll to top button
-    const handleScroll = () => {
-        if (scrollRef.current) {
-            const isScrolled = scrollRef.current.scrollTop > 200
-            setShowScrollTop(isScrolled)
-        }
-    }
+    const [visibleCount, setVisibleCount] = useState(20)
 
     const scrollToTop = () => {
         if (scrollRef.current) {
@@ -86,10 +78,10 @@ export default function SideBar({handleClick, currentCurrency}: SideBarProps) {
                 if (!aIsFav && bIsFav) return 1; 
             }
 
-            if (sorting === "highest_market_cap") return (b.market_cap ?? 0) - (a.market_cap ?? 0)
-            if (sorting === "lowest_market_cap") return (a.market_cap ?? 0) - (b.market_cap ?? 0)
-            if (sorting === "highest_price") return (b.current_price ?? 0) - (a.current_price ?? 0)
-            if (sorting === "lowest_price") return (a.current_price ?? 0) - (b.current_price ?? 0)
+            if (sorting === "highest_market_cap") return (b.market_cap?.[currentCurrency] ?? 0) - (a.market_cap?.[currentCurrency] ?? 0)
+            if (sorting === "lowest_market_cap") return (a.market_cap?.[currentCurrency] ?? 0) - (b.market_cap?.[currentCurrency] ?? 0)
+            if (sorting === "highest_price") return (b.current_price?.[currentCurrency] ?? 0) - (a.current_price?.[currentCurrency] ?? 0)
+            if (sorting === "lowest_price") return (a.current_price?.[currentCurrency] ?? 0) - (b.current_price?.[currentCurrency] ?? 0)
             if (sorting === "a-z") return a.name.localeCompare(b.name)
             if (sorting === "z-a") return b.name.localeCompare(a.name)
             return 0
@@ -97,7 +89,7 @@ export default function SideBar({handleClick, currentCurrency}: SideBarProps) {
         return result
     }, [coins, search, sorting, pinFavourties, favourites])
 
-    const showCoins = filteredCoins
+    const showCoins = filteredCoins.slice(visibleCount-20, visibleCount)
 
     return (
         <div className="flex flex-col justify-left">
@@ -124,17 +116,23 @@ export default function SideBar({handleClick, currentCurrency}: SideBarProps) {
             </form>
             <h2 className="text-left text-3xl font-bold">Results:</h2>
             <div className="relative">
-                <div ref={scrollRef} onScroll={handleScroll} className="h-[60vh] overflow-y-auto pr-2 border-gray-300 outline-2 outline-gray-300 rounded-2xl">
+                <div ref={scrollRef} className="h-[60vh] overflow-y-auto pr-2 border-gray-300 outline-2 outline-gray-300 rounded-2xl">
+                    {
+                        visibleCount != 20 && (
+                            <button onClick={() => setVisibleCount(prev => prev-20)}>Load Prev</button>
+                        )
+                    }
                     {
                         showCoins 
                             ? showCoins
                                 .map(coin => <Coin currentCurrency={currentCurrency} data={coin} handleCoinSelect={handleClick} refreshFavourites={loadFavourites} isFavourite={new Set(favourites.map(f => f.coinID)).has(coin.id)}/>)
                             : <div className="text-2xl font-bold">Nothing found...</div>
                     }
+                    <button onClick={() => {scrollToTop(); setVisibleCount(prev => prev+20)}}>Load Next</button>
                 </div>
                 {
-                    showScrollTop && (
-                        <button onClick={scrollToTop} className="absolute bottom-1 left-22">↑</button>
+                    visibleCount > 20 && (
+                        <button onClick={() => {scrollToTop(); setVisibleCount(20)}} className="absolute bottom--32 left-22">↑</button>
                     )
                 }
             </div>
