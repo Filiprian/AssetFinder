@@ -15,6 +15,15 @@ export default function Dashboard() {
   const apiKey = import.meta.env.VITE_API_KEY
   const options = {method: 'GET', headers: {'x-cg-demo-api-key': apiKey}};
 
+  const [currentCurrency, setCurrentCurreny] = useState("usd")
+  const handleCurrencySelect = () => {
+    if (currentCurrency == "usd") {
+        setCurrentCurreny("eur")
+    } else {
+        setCurrentCurreny("usd")
+    }
+  }
+
   const url = new URL(`https://api.coingecko.com/api/v3/coins/${coinID}`);
     url.searchParams.append('localization', 'false'); 
     url.searchParams.append('tickers', 'true');      
@@ -44,19 +53,18 @@ export default function Dashboard() {
   }, [coinID]);
 
   const md = coinData.market_data
-  console.log(coinData.id)
 
   return (
     <div className="flex flex-col justify-left items-start">
-        <Menu />
+        <Menu handleCurrencySelect={handleCurrencySelect} />
         <div className="flex">
-          <SideBar handleClick={handleCoinSelect}/>
+          <SideBar handleClick={handleCoinSelect} currentCurrency={currentCurrency}/>
           <div>
             <img src={coinData?.image?.small} alt={coinData?.id}/>
             <div>
                 <h1>{coinData?.id ?? "N/A"}</h1>
                 <h2>{coinData?.symbol ?? "N/A"}</h2>
-                <h2>{md?.current_price.usd ?? "N/A"} USD</h2>
+                <h2>{md?.current_price?.[currentCurrency] ?? "N/A"} {currentCurrency == "usd" ? "USD" : "EUR"}</h2>
             </div>
             <h1>Rank: {coinData.market_cap_rank ?? "N/A"}</h1>
             <div className="flex gap-25">
@@ -66,11 +74,11 @@ export default function Dashboard() {
                 </div>
                 <div>
                     <h3>All time high:</h3>
-                    <p>{md?.ath?.usd ?? "N/A"} USD</p>
+                    <p>{md?.ath?.[currentCurrency] ?? "N/A"} {currentCurrency == "usd" ? "USD" : "EUR"}</p>
                 </div>
                 <div>
                     <h3>24h volume:</h3>
-                    <p>{md?.total_volume?.usd ?? "N/A"}</p>
+                    <p>{md?.total_volume?.[currentCurrency] ?? "N/A"} {currentCurrency == "usd" ? "USD" : "EUR"}</p>
                 </div>
             </div>
             <div className="flex gap-25">
@@ -80,7 +88,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                     <h3>Market cap:</h3>
-                    <p>{md?.market_cap?.usd ?? "N/A"} USD</p>
+                    <p>{md?.market_cap?.[currentCurrency] ?? "N/A"} {currentCurrency == "usd" ? "USD" : "EUR"}</p>
                 </div>
                 <div>
                     <h3>Max supply:</h3>

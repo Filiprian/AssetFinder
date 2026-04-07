@@ -4,11 +4,12 @@ import { getCryptoData } from "../cryptoCache";
 import { fav_db } from "../db";
 
 interface SideBarProps {
+    currentCurrency: string,
     handleClick: (id: string) => void
 }
 
 
-export default function SideBar({handleClick}: SideBarProps) {
+export default function SideBar({handleClick, currentCurrency}: SideBarProps) {
 
     const [coins, setCoins] = useState([])
     const [favourites, setFavourties] = useState([])
@@ -127,7 +128,7 @@ export default function SideBar({handleClick}: SideBarProps) {
                     {
                         showCoins 
                             ? showCoins
-                                .map(coin => <Coin data={coin} handleCoinSelect={handleClick} refreshFavourites={loadFavourites} isFavourite={new Set(favourites.map(f => f.coinID)).has(coin.id)}/>)
+                                .map(coin => <Coin currentCurrency={currentCurrency} data={coin} handleCoinSelect={handleClick} refreshFavourites={loadFavourites} isFavourite={new Set(favourites.map(f => f.coinID)).has(coin.id)}/>)
                             : <div className="text-2xl font-bold">Nothing found...</div>
                     }
                 </div>

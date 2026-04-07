@@ -7,9 +7,10 @@ interface CoinProps {
     handleCoinSelect: (id: string) => void
     refreshFavourites: () => void
     isFavourite: boolean
+    currentCurrency: string
 }
 
-export default function Coin({data, handleCoinSelect, refreshFavourites, isFavourite}: CoinProps) {
+export default function Coin({data, handleCoinSelect, refreshFavourites, isFavourite, currentCurrency}: CoinProps) {
 
     const coin = data
     const handleClick = () => {
@@ -40,7 +41,7 @@ export default function Coin({data, handleCoinSelect, refreshFavourites, isFavou
             <div className="flex justify-between items-center w-full">
                 <div>
                     <h2 className="text-amber-400 text-xl font-bold text-left">{coin.symbol?.toUpperCase() || "N/A"}</h2>
-                    <h2>{coin.current_price || "N/A"} USD </h2>
+                    <h2>{coin.current_price?.[currentCurrency] || "N/A"} {currentCurrency == "usd" ? "USD" : "EUR"} </h2>
                 </div>
                 <div className="text-2xl" onClick={toggleFavourite}>
                     {isFavourite ? (

@@ -1,10 +1,13 @@
 import { useState } from "react";
 
+interface MenuProps {
+    handleCurrencySelect: () => void
+}
 
-export default function Menu() {
+
+export default function Menu({handleCurrencySelect}: MenuProps) {
 
     const [darkMode, setDarkMode] = useState(false);
-    const [currency, setCurrency] = useState("usd");
 
 
     return (
@@ -16,7 +19,7 @@ export default function Menu() {
             </div>
             <div className="flex gap-2.5">
                 <label>Currency:</label>
-                <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
+                <select onChange={handleCurrencySelect}>
                     <option value="usd">USD</option>
                     <option value="eur">EUR</option>
                 </select>
