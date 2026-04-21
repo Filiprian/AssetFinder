@@ -5,11 +5,13 @@ import { fav_db } from "../db";
 
 interface SideBarProps {
   currentCurrency: string;
+  darkMode: boolean;
   handleClick: (id: string) => void;
 }
 
 export default function SideBar({
   handleClick,
+  darkMode,
   currentCurrency,
 }: SideBarProps) {
   const [coins, setCoins] = useState([]);
@@ -22,6 +24,18 @@ export default function SideBar({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const [visibleCount, setVisibleCount] = useState(20);
+
+  const themeStyles = {
+    whole_bg: darkMode
+      ? "bg-slate-950 text-white border-slate-800"
+      : "bg-white text-black border-slate-300",
+    input: darkMode
+      ? "border-gray-900 bg-gray-800 hover:bg-slate-700"
+      : "border-slate-300 bg-slate-100/50 hover:bg-white",
+    button: darkMode
+      ? "text-white bg-slate-900 hover:bg-slate-700 active:bg-indigo-500 active:text-black"
+      : "text-black bg-slate-100/50 border-slate-300 border-2 hover:bg-white active:bg-indigo-400 active:text-white",
+  };
 
   const scrollToTop = () => {
     if (scrollRef.current) {
@@ -110,18 +124,22 @@ export default function SideBar({
   const showCoins = filteredCoins.slice(visibleCount - 20, visibleCount);
 
   return (
-    <div className="flex flex-col justify-left bg-slate-950 h-screen min-h-0 border-2 border-slate-700">
-      <h2 className="text-left text-5xl font-bold m-5">Coins:</h2>
-      <form className="flex flex-col gap-5 justify-center items-center w-full">
-        <div className="flex">
+    <div
+      className={`flex flex-col justify-left h-screen min-h-0 border-2 ${themeStyles.whole_bg}`}
+    >
+      <h2 className={`text-left text-5xl font-bold m-5`}>Coins:</h2>
+      <form
+        className={`flex flex-col gap-5 justify-center items-center w-full`}
+      >
+        <div className={`flex`}>
           <input
-            className="rounded-xl py-1 px-4 text-xl outline-none border-2 border-gray-800 bg-gray-800 hover:bg-slate-700"
+            className={`rounded-xl py-1 px-4 text-xl outline-none border-2 shadow-md ${themeStyles.input}`}
             placeholder="Search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex font-semibold justify-between text-2xl gap-8">
+        <div className={`flex font-semibold justify-between text-2xl gap-8`}>
           <label>Pin favourties:</label>
           <div
             className={`w-16 h-8 rounded-full transition-all duration-300 cursor-pointer relative shadow-inner" ${pinFavourties ? "bg-indigo-700" : "bg-slate-500"}`}
@@ -132,9 +150,9 @@ export default function SideBar({
             ></div>
           </div>
         </div>
-        <div className="flex gap-3.5">
+        <div className={`flex gap-3.5`}>
           <select
-            className="rounded-xl py-2 px-4 text-2xl outline-none border-2 border-gray-800 bg-gray-800 cursor-pointer"
+            className={`rounded-xl py-2 px-4 text-2xl outline-none border-2 shadow-md cursor-pointer ${themeStyles.input}`}
             value={sorting}
             onChange={(e) => setSorting(e.target.value)}
           >
@@ -147,15 +165,15 @@ export default function SideBar({
           </select>
         </div>
       </form>
-      <div className="grow min-h-0">
+      <div className={`grow min-h-0`}>
         <div
           ref={scrollRef}
-          className="overflow-y-auto h-full flex flex-col pb-45 pt-5 mx-2"
+          className={`overflow-y-auto h-full flex flex-col pb-45 pt-5 mx-2`}
         >
-          <div className="flex flex-1 justify-center gap-10">
+          <div className={`flex flex-1 justify-center gap-10`}>
             {visibleCount != 20 && (
               <button
-                className="text-2xl p-2 px-5 font-bold rounded-xl bg-slate-900 cursor-pointer hover:bg-slate-700 active:bg-indigo-500 active:text-black"
+                className={`text-2xl p-2 px-5 font-bold rounded-xl cursor-pointer ${themeStyles.button}`}
                 onClick={() => setVisibleCount((prev) => prev - 20)}
               >
                 Load Prev
@@ -167,7 +185,7 @@ export default function SideBar({
                   scrollToTop();
                   setVisibleCount(20);
                 }}
-                className="rounded-xl text-2xl p-2 bg-slate-900 font-bold cursor-pointer hover:bg-slate-700 active:bg-indigo-500 active:text-black"
+                className={`rounded-xl text-2xl p-2 font-bold cursor-pointer ${themeStyles.button}`}
               >
                 ↑
               </button>
@@ -180,16 +198,17 @@ export default function SideBar({
                 data={coin}
                 handleCoinSelect={handleClick}
                 refreshFavourites={loadFavourites}
+                darkMode={darkMode}
                 isFavourite={new Set(favourites.map((f) => f.coinID)).has(
                   coin.id,
                 )}
               />
             ))
           ) : (
-            <div className="text-2xl font-bold">Nothing found...</div>
+            <div className={`text-2xl font-bold`}>Nothing found...</div>
           )}
           <button
-            className="text-2xl p-2 font-bold w-full rounded-xl bg-slate-900 cursor-pointer hover:bg-slate-700 active:bg-indigo-500 active:text-black"
+            className={`text-2xl p-2 font-bold w-full rounded-xl cursor-pointer ${themeStyles.button}`}
             onClick={() => {
               scrollToTop();
               setVisibleCount((prev) => prev + 20);
